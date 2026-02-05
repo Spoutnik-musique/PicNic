@@ -241,8 +241,13 @@
         }
 
         .seconds-card {
-            grid-column: span 4;
+            grid-column: span 3;
             background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(245, 245, 245, 0.98) 100%);
+        }
+
+        .percentage-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(245, 245, 245, 0.98) 100%);
+            color: #ff4444;
         }
 
         .seconds-card .card-value {
@@ -601,7 +606,13 @@
                 <div class="card-label">Secondes</div>
             </div>
         </div>
-    </div>
+
+        <div class="bento-card percentage-card">
+            <div class="card-content">
+                <div class="card-value" id="percentage">0%</div>
+                <div class="card-label">Progression</div>
+            </div>
+        </div>
 </div>
 
 <script>
@@ -612,7 +623,8 @@ const valueMap = {
     days: '0',
     weeks: '0',
     months: '0',
-    years: '0'
+    years: '0',
+    percentage: '0%'
 };
 
 function updateValueWithFlip(elementId, newValue) {
@@ -633,6 +645,7 @@ function updateValueWithFlip(elementId, newValue) {
 function updateTime() {
     const now = new Date();
     const target = new Date("2026-10-03T00:00:00");
+    const start = new Date("2025-11-20T00:00:00");
 
     let diffMs = target - now;
     if (diffMs < 0) diffMs = 0;
@@ -645,17 +658,24 @@ function updateTime() {
     const months  = Math.floor(days / 30.4375);
     const years   = Math.floor(days / 365.25);
 
+    // Calcul du pourcentage
+    const totalDuration = target - start;
+    const elapsedDuration = now - start;
+    const percentage = Math.max(0, Math.min(100, (elapsedDuration / totalDuration) * 100));
+    const percentageValue = percentage.toFixed(1) + '%';
+
     const updates = [
         { id: 'seconds', value: seconds },
         { id: 'minutes', value: minutes },
         { id: 'hours', value: hours },
         { id: 'days', value: days },
         { id: 'weeks', value: weeks },
-        { id: 'months', value: months }
+        { id: 'months', value: months },
+        { id: 'percentage', value: percentageValue }
     ];
 
     updates.forEach(update => {
-        const newValue = update.value.toLocaleString();
+        const newValue = typeof update.value === 'number' ? update.value.toLocaleString() : update.value;
         updateValueWithFlip(update.id, newValue);
     });
 }
